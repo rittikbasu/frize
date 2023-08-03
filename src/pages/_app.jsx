@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import '@/styles/globals.css'
+import "@/styles/globals.css";
 import Navbar from "@/components/Navbar";
 
 export default function App({ Component, pageProps }) {
@@ -13,9 +13,9 @@ export default function App({ Component, pageProps }) {
       <div className="relative selection:bg-indigo-500 selection:text-white dark:selection:bg-indigo-800">
         <Navbar />
         <main>
-        <Component {...pageProps} />
+          <Component {...pageProps} />
         </main>
       </div>
     </main>
-  )
+  );
 }
