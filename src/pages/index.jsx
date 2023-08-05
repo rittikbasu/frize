@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Chart from "@/components/Chart";
 import {
@@ -13,10 +13,19 @@ import {
   Metric,
   DateRangePicker,
   DateRangePickerItem,
+  Button,
+  TextInput,
 } from "@tremor/react";
+import { BiSearch } from "react-icons/bi";
 import { timeFormatter } from "@/utils/timeFormatter";
 import { getCategories } from "@/utils/getCategories";
-import { getInsights } from "@/utils/getInsights";
+import {
+  getInsights,
+  getAverages,
+  getAverageWorkWeek,
+} from "@/utils/getInsights";
+import Drawer from "react-modern-drawer";
+import "react-modern-drawer/dist/index.css";
 
 export default function Home({ data }) {
   const [categoryData, setCategoryData] = useState(getCategories(data));
@@ -25,128 +34,251 @@ export default function Home({ data }) {
   // from date should be 1 month before to date
   const fromDate = new Date();
   fromDate.setMonth(fromDate.getMonth() - 1);
+  const toDate = new Date();
+  toDate.setDate(toDate.getDate() - 1);
   const [dateInput, setDateInput] = useState({
     from: fromDate,
-    to: new Date(),
+    to: toDate,
   });
+  const [totalDays, setTotalDays] = useState(getTotalDays(fromDate, toDate));
+  const last7Days = new Date();
+  last7Days.setDate(last7Days.getDate() - 7);
 
-  function last7Days() {
-    const today = new Date();
-    const last7Days = new Date(today.setDate(today.getDate() - 7));
-
-    return last7Days;
+  function getTotalDays(fromDate, toDate) {
+    console.log(fromDate, toDate);
+    const oneDay = 24 * 60 * 60 * 1000;
+    const diffDays = Math.round(Math.abs((fromDate - toDate) / oneDay) + 1);
+    return diffDays;
   }
+  console.log(totalDays);
 
   async function dateChangeHandler(date) {
     console.log(date);
-    setDateInput(date);
-    if (date.to !== undefined && date.from !== undefined) {
-      let start = new Date(date.from);
-      start.setDate(start.getDate() + 1);
-      let end = new Date(date.to);
-      end.setDate(end.getDate() + 1);
-
-      const request = await fetch(
-        `/api/supabase?start=${start.toISOString().slice(0, 10)}&end=${end
-          .toISOString()
-          .slice(0, 10)}`
-      );
+    if (date.selectValue === "Last work day") {
+      const request = await fetch(`/api/supabase?type=last_work_day`);
       const response = await request.json();
       setChartData(response.data);
+
+      const date = new Date(response.data[0].date);
+      date.setFullYear(new Date().getFullYear());
+      setDateInput({
+        from: date,
+        to: date,
+      });
       setCategoryData(getCategories(response.data));
+      setTotalDays(1);
+    } else {
+      setDateInput(date);
+      if (date.to !== undefined && date.from !== undefined) {
+        let start;
+        let end;
+        if (date.selectValue === "Last 7 days") {
+          start = date.from;
+          end = date.to;
+        } else {
+          start = new Date(date.from);
+          start.setDate(start.getDate() + 1);
+          end = new Date(date.to);
+          end.setDate(end.getDate() + 1);
+        }
+
+        const request = await fetch(
+          `/api/supabase?start=${start.toISOString().slice(0, 10)}&end=${end
+            .toISOString()
+            .slice(0, 10)}`
+        );
+        const response = await request.json();
+        setChartData(response.data);
+        setCategoryData(getCategories(response.data));
+        console.log(start, end);
+        setTotalDays(getTotalDays(start, end));
+      }
     }
   }
 
-  const barListData = getInsights(chartData);
+  const totalHoursData = getInsights(chartData);
+  const averageHoursData = getAverages(chartData);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const openDrawer = () => {
+    setIsOpen(true);
+  };
+
+  const closeDrawer = () => {
+    setIsOpen(false);
+  };
+
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains("dark"));
+    console.log(isDark);
+  }, [isOpen]);
+
+  // const [query, setQuery] = useState("How many hours worked in May 2023");
+  // const [searchResults, setSearchResults] = useState([]);
+
+  // const handleSearch = async () => {
+  //   try {
+  //     const response = await fetch("/api/semanticSearch", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ query }),
+  //     });
+
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       console.log(data);
+  //     } else {
+  //       console.error("Error fetching search results");
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching search results:", error);
+  //   }
+  // };
+
+  // handleSearch();
 
   return (
-    <div className="max-w-5xl lg:mx-auto flex flex-col gap-y-10 items-center lg:justify-center h-screen px-4 mt-28 lg:my-[40rem]">
-      <DateRangePicker
-        className="max-w-sm mx-auto focus:outline-none"
-        enableSelect={true}
-        enableYearNavigation={true}
-        enableClear={true}
-        placeholder="Select a date range"
-        selectPlaceholder="Select"
-        value={dateInput}
-        onValueChange={dateChangeHandler}
-        minDate={new Date("2022-12-24")}
-        maxDate={new Date()}
-        color="lime"
-      >
-        <DateRangePickerItem
-          className=""
+    <div className="max-w-5xl lg:mx-auto flex flex-col items-center gap-y-6 lg:justify-center h-full px-4 mt-28 lg:my-26">
+      {/* put date range picker and search side by side */}
+      <div className="flex flex-col justify-center items-center gap-y-6">
+        <DateRangePicker
+          className="max-w-sm mx-auto focus:outline-none px-4"
+          enableSelect={true}
+          enableYearNavigation={true}
+          enableClear={true}
+          placeholder="Select a date range"
+          selectPlaceholder="Select"
+          value={dateInput}
+          onValueChange={dateChangeHandler}
+          minDate={new Date("2022-12-24")}
+          maxDate={toDate}
+          defaultValue={dateInput}
           color="lime"
-          key="last_7_days"
-          value="Last 7 days"
-          from={last7Days()}
-          to={new Date()}
-        />
-        <DateRangePickerItem
-          className=""
-          color="lime"
-          key="all_data"
-          value="All time"
-          from={new Date("2022-12-24")}
-          to={new Date()}
-        />
-      </DateRangePicker>
-      <Chart chartData={chartData} />
-      <Card className="">
-        <Title>Insights</Title>
-        <BarList
-          data={barListData}
-          className="mt-6"
-          valueFormatter={timeFormatter}
-        />
-      </Card>
-      <Card className="">
-        <Title>Category</Title>
-        <BarList
-          data={categoryData}
-          className="mt-6"
-          valueFormatter={timeFormatter}
-        />
-      </Card>
+        >
+          <DateRangePickerItem
+            className=""
+            color="lime"
+            key="last_work_day"
+            value="Last work day"
+          />
+          <DateRangePickerItem
+            className=""
+            color="lime"
+            key="last_7_days"
+            value="Last 7 days"
+            from={last7Days}
+            to={toDate}
+          />
+          <DateRangePickerItem
+            className=""
+            color="lime"
+            key="all_data"
+            value="All time"
+            from={new Date("2022-12-24")}
+            to={new Date()}
+          />
+        </DateRangePicker>
+        <Button
+          size="sm"
+          icon={BiSearch}
+          className="border dark:border-gray-800 border-gray-200 rounded-2xl py-1 px-4"
+          color="blue"
+          variant="light"
+          onClick={openDrawer}
+        >
+          Search
+          <Drawer
+            open={isOpen}
+            onClose={closeDrawer}
+            direction="bottom"
+            className="rounded-t-2xl max-w-3xl mx-auto bg-black border-t-4 dark:border-t dark:border-blue-500 border-blue-600"
+            overlayOpacity={0.7}
+            size="80vh"
+            lockBackgroundScroll={true}
+            // make backround transparent
+            style={{
+              backgroundColor: isDark
+                ? "rgba(0,0,0,0.8)"
+                : "rgba(255,255,255,0.8)",
+            }}
+          >
+            <div className="my-4 h-full">
+              {/* close button beside title */}
+              <div className="text-center">
+                <Title>AI powered search</Title>
+              </div>
 
-      {/*  make a card showing the average hours worked, focus, breaks */}
-      <Grid
-        numItems={1}
-        numItemsSm={2}
-        numItemsLg={6}
-        className="lg:gap-4 gap-y-4"
-      >
-        <Col numColSpan={3}>
-          <Card className="">
-            <Title>Insights</Title>
-            <BarList
-              data={barListData}
-              className="mt-6"
-              valueFormatter={timeFormatter}
-            />
-          </Card>
-        </Col>
-        <Col numColSpan={3}>
-          <Card className="">
-            <Title>Category</Title>
-            <BarList
-              data={categoryData}
-              className="mt-6"
-              valueFormatter={timeFormatter}
-            />
-          </Card>
-        </Col>
-        <Col numColSpan={1}>
-          <Card className="bg-zinc-700 dark:bg-slate-950">
-            <Text className="text-center text-base font-bold dark:text-lime-500">
-              Average Breaks
-            </Text>
-            <Metric className="text-center text-xl font-bold">
-              {timeFormatter(barListData[1].value)}
-            </Metric>
-          </Card>
-        </Col>
-      </Grid>
+              {/*  text appears on the right side everytime user searches */}
+              <div className="flex flex-col gap-y-4">
+                <Text className="text-center">
+                  Search for insights from your data
+                </Text>
+                <Text className="text-center">
+                  Try searching for "How many hours worked in May 2023"
+                </Text>
+              </div>
+
+              <div className="fixed bottom-0 w-full px-4 my-4">
+                <TextInput
+                  placeholder="Search"
+                  className="w-full"
+                  icon={BiSearch}
+                />
+              </div>
+            </div>
+          </Drawer>
+        </Button>
+      </div>
+      <div className="gap-y-6 flex flex-col w-full">
+        <Chart chartData={chartData} />
+        <div className="lg:grid lg:grid-rows-3 grid-flow-col space-y-6 lg:gap-y-6 lg:space-y-0 gap-x-4">
+          <div className="lg:col-span-1">
+            <Card className="">
+              <Title>Insights</Title>
+              <Text className="mt-2">
+                Showing data for {chartData.length} days
+              </Text>
+              <BarList
+                data={totalHoursData}
+                className="mt-6"
+                valueFormatter={timeFormatter}
+              />
+              {totalDays > 1 && (
+                <Text className="mt-6 dark:font-medium">
+                  Did not work for {totalDays - chartData.length} days out of{" "}
+                  {totalDays} days
+                </Text>
+              )}
+            </Card>
+          </div>
+          <div className="lg:col-span-1">
+            <Card className="">
+              <Title>Average</Title>
+              <BarList
+                data={averageHoursData}
+                className="mt-6"
+                valueFormatter={timeFormatter}
+              />
+              {/* <Text className="mt-6 dark:font-medium">
+                Worked for {getAverageWorkWeek(chartData)} a week on average
+              </Text> */}
+            </Card>
+          </div>
+          <div className="lg:row-span-3 lg:col-span-2">
+            <Card className="">
+              <Title>Category</Title>
+              <BarList
+                data={categoryData}
+                className="mt-6"
+                valueFormatter={timeFormatter}
+              />
+            </Card>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -157,8 +289,10 @@ export const getStaticProps = async () => {
   const SupabaseAdmin = createClient(supabaseUrl, supabaseServerKey);
 
   const startDate = new Date();
+  // startDate.setDate(startDate.getDate() - 2);
   startDate.setMonth(startDate.getMonth() - 1);
   const endDate = new Date();
+  endDate.setDate(endDate.getDate() - 1);
 
   const { data, error } = await SupabaseAdmin.from("insights")
     .select("work_hours, focus, breaks, date, categories")

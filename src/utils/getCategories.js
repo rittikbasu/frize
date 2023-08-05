@@ -13,9 +13,16 @@ export function getCategories(data) {
     }
     });
 
+    // get total work hours
+    let total_work_hours = 0;
+    for (let i = 0; i < data.length; i++) {
+        total_work_hours += data[i].work_hours;
+    }
+
     // Convert the object back to an array of objects
     const uniqueNamesArray = Object.keys(uniqueNamesMap).map((name) => ({
-    name,
+    // add the percentage of time spent on each category rounded to 2 decimal places
+    name: `${name} → ${Math.round((uniqueNamesMap[name] / total_work_hours) * 100)}%`,
     value: uniqueNamesMap[name],
     }));
 

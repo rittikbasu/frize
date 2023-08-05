@@ -5,23 +5,36 @@ const supabaseServerKey = process.env.SUPABASE_SERVICE_KEY || ''
 
 export const SupabaseAdmin = createClient(supabaseUrl, supabaseServerKey)
 
+function processData(data) {
+  data.forEach((item) => {
+    const date = new Date(item.date);
+    const month = date.toLocaleString("default", { month: "short" });
+    item.date = `${date.getDate()} ${month}`;
+  });
+  return data.reverse();
+}
+
 export default async (req, res) => {
   if (req.method === 'GET') {
-    console.log(req.query.start, req.query.end)
-    const { data } = await SupabaseAdmin.from('insights')
-      .select("work_hours, focus, breaks, date, categories")
-      .gte("date", req.query.start)
-      .lte("date", req.query.end)
-      .order("date", { ascending: false });
-
-    if (data) {
-      data.forEach((item) => {
-        const date = new Date(item.date);
-        const month = date.toLocaleString("default", { month: "short" });
-        item.date = `${date.getDate()} ${month}`;
-      });
+    let data;
+    if (req.query.type === 'last_work_day') {
+      const { data } = await SupabaseAdmin.from('insights')
+        .select("work_hours, focus, breaks, date, categories")
+        .order("date", { ascending: false })
+        .limit(1);
       return res.status(200).json({
-        data: data.reverse() || null,
+        data: processData(data) || null,
+      })
+    } 
+    else {
+      console.log(req.query.start, req.query.end)
+      const { data } = await SupabaseAdmin.from('insights')
+        .select("work_hours, focus, breaks, date, categories")
+        .gte("date", req.query.start)
+        .lte("date", req.query.end)
+        .order("date", { ascending: false });
+      return res.status(200).json({
+        data: processData(data) || null,
       })
     }
   }
