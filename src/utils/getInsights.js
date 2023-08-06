@@ -7,11 +7,7 @@ export function getInsights(data) {
       total_focus += data[i].focus;
       total_breaks += data[i].breaks;
     }
-    // get the date from 1st entry then get the date from last entry
-    // const start_date = new Date(data[0].date);
-    // const end_date = new Date(data[data.length - 1].date);
-    // // calculate the number of days between the two dates including the start and end date
-    // const total_days = Math.floor((end_date - start_date) / (1000 * 60 * 60 * 24)) + 1;
+
     const total_days = data.length;
     const total_hours = total_days * 24;
     // get percentage of time spent working, focus, and breaks rounded to 2 decimal places
@@ -29,27 +25,6 @@ export function getInsights(data) {
       { name: `Total Work Hours → ${percent_work}%`, value: total_work_hours },
       { name: `Total Focus Time → ${percent_focus}%`, value: total_focus },
       { name: `Total Breaks → ${percent_breaks}%`, value: total_breaks },
-    ]
-    );
-}
-
-export function getAverages(data) {
-  let total_work_hours = 0;
-    let total_focus = 0;
-    let total_breaks = 0;
-    for (let i = 0; i < data.length; i++) {
-      total_work_hours += data[i].work_hours;
-      total_focus += data[i].focus;
-      total_breaks += data[i].breaks;
-    }
-    const total_days = data.length;
-    
-    // average work hours, focus, and breaks per day
-    const avg_work_hours = Math.round((total_work_hours / total_days) * 100) / 100;
-    const avg_focus = Math.round((total_focus / total_days) * 100) / 100;
-    const avg_breaks = Math.round((total_breaks / total_days) * 100) / 100;
-
-    return ([
       { name: `Average Work Hours`, value: avg_work_hours },
       { name: `Average Focus Time`, value: avg_focus },
       { name: `Average Breaks`, value: avg_breaks },

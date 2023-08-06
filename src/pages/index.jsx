@@ -19,18 +19,22 @@ import {
 import { BiSearch } from "react-icons/bi";
 import { timeFormatter } from "@/utils/timeFormatter";
 import { getCategories } from "@/utils/getCategories";
-import {
-  getInsights,
-  getAverages,
-  getAverageWorkWeek,
-} from "@/utils/getInsights";
+import { getInsights } from "@/utils/getInsights";
 import Drawer from "react-modern-drawer";
 import "react-modern-drawer/dist/index.css";
 
-export default function Home({ data }) {
-  const [categoryData, setCategoryData] = useState(getCategories(data));
-  console.log(categoryData);
+export default function Home({
+  data,
+  totalHoursData,
+  averageHoursData,
+  categoryData,
+}) {
+  // const [categoryData, setCategoryData] = useState(getCategories(data));
   const [chartData, setChartData] = useState(data);
+  const [totalHours, setTotalHours] = useState(totalHoursData);
+  const [averageHours, setAverageHours] = useState(averageHoursData);
+  const [categories, setCategories] = useState(categoryData);
+
   // from date should be 1 month before to date
   const fromDate = new Date();
   fromDate.setMonth(fromDate.getMonth() - 1);
@@ -58,14 +62,15 @@ export default function Home({ data }) {
       const request = await fetch(`/api/supabase?type=last_work_day`);
       const response = await request.json();
       setChartData(response.data);
-
+      setTotalHours(response.totalHoursData);
+      setAverageHours(response.averageHoursData);
+      setCategories(response.categoryData);
       const date = new Date(response.data[0].date);
       date.setFullYear(new Date().getFullYear());
       setDateInput({
         from: date,
         to: date,
       });
-      setCategoryData(getCategories(response.data));
       setTotalDays(1);
     } else {
       setDateInput(date);
@@ -89,15 +94,15 @@ export default function Home({ data }) {
         );
         const response = await request.json();
         setChartData(response.data);
-        setCategoryData(getCategories(response.data));
+        setTotalHours(response.totalHoursData);
+        setAverageHours(response.averageHoursData);
+        setCategories(response.categoryData);
+        console.log(categories);
         console.log(start, end);
         setTotalDays(getTotalDays(start, end));
       }
     }
   }
-
-  const totalHoursData = getInsights(chartData);
-  const averageHoursData = getAverages(chartData);
 
   const [isOpen, setIsOpen] = useState(false);
   const openDrawer = () => {
@@ -141,9 +146,58 @@ export default function Home({ data }) {
   // handleSearch();
 
   return (
-    <div className="max-w-5xl lg:mx-auto flex flex-col items-center gap-y-6 lg:justify-center h-full px-4 mt-28 lg:my-26">
+    <div className="max-w-5xl lg:mx-auto flex flex-col items-center gap-y-10 lg:justify-center h-full px-4 my-20 lg:my-26">
+      <div className="fixed bottom-8 lg:bottom-6 z-50 w-full text-center">
+        <Button
+          size="md"
+          icon={BiSearch}
+          className="border dark:border-gray-800 border-gray-200 rounded-2xl py-1 px-4 dark:bg-black/30 bg-white/30 backdrop-blur"
+          color="blue"
+          variant="light"
+          onClick={openDrawer}
+        >
+          Search
+        </Button>
+      </div>
+      <Drawer
+        open={isOpen}
+        onClose={closeDrawer}
+        direction="bottom"
+        className="rounded-t-2xl w-full max-w-5xl mx-auto bg-black border-t-4 dark:border-t dark:border-blue-500 border-blue-600"
+        overlayOpacity={0.7}
+        size="80vh"
+        lockBackgroundScroll={true}
+        // make backround transparent
+        style={{
+          backgroundColor: isDark ? "rgba(0,0,0,0.8)" : "rgba(255,255,255,0.8)",
+        }}
+      >
+        <div className="my-4 h-full">
+          <div className="text-center">
+            <Title>AI powered search</Title>
+          </div>
+
+          {/*  text appears on the right side everytime user searches */}
+          <div className="flex flex-col gap-y-4">
+            <Text className="text-center">
+              Search for insights from your data
+            </Text>
+            <Text className="text-center">
+              Try searching for How many hours worked in May 2023
+            </Text>
+          </div>
+
+          <div className="fixed bottom-0 w-full px-4 my-4">
+            <TextInput
+              placeholder="Search"
+              className="w-full"
+              icon={BiSearch}
+            />
+          </div>
+        </div>
+      </Drawer>
       {/* put date range picker and search side by side */}
-      <div className="flex flex-col justify-center items-center gap-y-6">
+      <div className="flex flex-col justify-center items-center gap-y-10">
         <DateRangePicker
           className="max-w-sm mx-auto focus:outline-none px-4"
           enableSelect={true}
@@ -181,84 +235,34 @@ export default function Home({ data }) {
             to={new Date()}
           />
         </DateRangePicker>
-        <Button
-          size="sm"
-          icon={BiSearch}
-          className="border dark:border-gray-800 border-gray-200 rounded-2xl py-1 px-4"
-          color="blue"
-          variant="light"
-          onClick={openDrawer}
-        >
-          Search
-          <Drawer
-            open={isOpen}
-            onClose={closeDrawer}
-            direction="bottom"
-            className="rounded-t-2xl max-w-3xl mx-auto bg-black border-t-4 dark:border-t dark:border-blue-500 border-blue-600"
-            overlayOpacity={0.7}
-            size="80vh"
-            lockBackgroundScroll={true}
-            // make backround transparent
-            style={{
-              backgroundColor: isDark
-                ? "rgba(0,0,0,0.8)"
-                : "rgba(255,255,255,0.8)",
-            }}
-          >
-            <div className="my-4 h-full">
-              {/* close button beside title */}
-              <div className="text-center">
-                <Title>AI powered search</Title>
-              </div>
-
-              {/*  text appears on the right side everytime user searches */}
-              <div className="flex flex-col gap-y-4">
-                <Text className="text-center">
-                  Search for insights from your data
-                </Text>
-                <Text className="text-center">
-                  Try searching for "How many hours worked in May 2023"
-                </Text>
-              </div>
-
-              <div className="fixed bottom-0 w-full px-4 my-4">
-                <TextInput
-                  placeholder="Search"
-                  className="w-full"
-                  icon={BiSearch}
-                />
-              </div>
-            </div>
-          </Drawer>
-        </Button>
       </div>
-      <div className="gap-y-6 flex flex-col w-full">
-        <Chart chartData={chartData} />
-        <div className="lg:grid lg:grid-rows-3 grid-flow-col space-y-6 lg:gap-y-6 lg:space-y-0 gap-x-4">
-          <div className="lg:col-span-1">
-            <Card className="">
-              <Title>Insights</Title>
-              <Text className="mt-2">
-                Showing data for {chartData.length} days
+      <Chart chartData={chartData} />
+      <div className="lg:grid lg:grid-rows-3 grid-flow-col gap-y-10 space-y-10 lg:space-y-0 gap-x-4 w-full">
+        <div className="lg:col-span-1">
+          <Card className="">
+            <Title>Insights</Title>
+            <Text className="mt-2">
+              Showing data for {chartData.length} days
+            </Text>
+            <BarList
+              data={totalHours}
+              className="mt-6"
+              valueFormatter={timeFormatter}
+            />
+            {totalDays > 1 && (
+              <Text className="mt-6 dark:font-medium">
+                Did not work for {totalDays - chartData.length} days out of{" "}
+                {totalDays} days
               </Text>
-              <BarList
-                data={totalHoursData}
-                className="mt-6"
-                valueFormatter={timeFormatter}
-              />
-              {totalDays > 1 && (
-                <Text className="mt-6 dark:font-medium">
-                  Did not work for {totalDays - chartData.length} days out of{" "}
-                  {totalDays} days
-                </Text>
-              )}
-            </Card>
-          </div>
+            )}
+          </Card>
+        </div>
+        {chartData.length > 1 && (
           <div className="lg:col-span-1">
             <Card className="">
               <Title>Average</Title>
               <BarList
-                data={averageHoursData}
+                data={averageHours}
                 className="mt-6"
                 valueFormatter={timeFormatter}
               />
@@ -267,19 +271,20 @@ export default function Home({ data }) {
               </Text> */}
             </Card>
           </div>
-          <div className="lg:row-span-3 lg:col-span-2">
-            <Card className="">
-              <Title>Category</Title>
-              <BarList
-                data={categoryData}
-                className="mt-6"
-                valueFormatter={timeFormatter}
-              />
-            </Card>
-          </div>
+        )}
+        <div className="lg:row-span-3 lg:col-span-2">
+          <Card className="">
+            <Title>Category</Title>
+            <BarList
+              data={categoryData}
+              className="mt-6"
+              valueFormatter={timeFormatter}
+            />
+          </Card>
         </div>
       </div>
     </div>
+    // </div>
   );
 }
 
@@ -314,9 +319,17 @@ export const getStaticProps = async () => {
     data.reverse();
   }
 
+  const insightsData = getInsights(data);
+  const totalHoursData = insightsData.slice(0, 3);
+  const averageHoursData = insightsData.slice(3, 6);
+  const categoryData = getCategories(data);
+
   return {
     props: {
       data: data,
+      totalHoursData: totalHoursData,
+      averageHoursData: averageHoursData,
+      categoryData: categoryData,
     },
     revalidate: 1,
   };

@@ -16,6 +16,8 @@ export default function Chart(chartData) {
         yAxisWidth={26}
         // showLegend={false}
         curveType="monotone"
+        // showYAxis={false}
+        // showTooltip={false}
       />
     </Card>
   );
