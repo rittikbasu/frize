@@ -134,7 +134,7 @@ export default function SearchDrawer(props) {
         <div
           className={`${
             loading ? "bg-gray-200 dark:bg-gray-600" : "bg-white dark:bg-black"
-          } mx-2 mb-6 mt-2 dark:border border-r-0 border-gray-400/50 dark:border-gray-700 rounded-full`}
+          } mx-2 mb-6 mt-2 dark:border dark:border-r-0 border-gray-400/50 dark:border-gray-700 rounded-full`}
         >
           <div className="flex items-center gap-x-2">
             <input
@@ -143,7 +143,7 @@ export default function SearchDrawer(props) {
                 loading
                   ? "bg-gray-200 dark:bg-gray-600"
                   : "bg-white dark:bg-black"
-              } w-full border-none text-sm text-gray-900 dark:text-white px-4 outline-none rounded-full`}
+              } w-full border-none text-sm text-gray-900 dark:text-white pl-4 outline-none rounded-full`}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => {
@@ -153,15 +153,15 @@ export default function SearchDrawer(props) {
               }}
               disabled={loading}
             />
-            <Button
-              size="md"
-              className="py-2 rounded-3xl pr-1 pl-3"
-              color="blue"
-              variant="primary"
-              icon={BiSearch}
-              loading={loading}
+            <button
+              className={`p-2 text-white rounded-full ${
+                loading && "animate-spin opacity-60 cursor-wait"
+              } bg-blue-500 dark:bg-blue-700`}
+              disabled={loading}
               onClick={handleSearch}
-            ></Button>
+            >
+              <BiSearch />
+            </button>
           </div>
         </div>
       </div>
