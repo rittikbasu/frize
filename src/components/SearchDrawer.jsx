@@ -75,7 +75,7 @@ export default function SearchDrawer(props) {
       direction="bottom"
       className="rounded-t-2xl w-full max-w-5xl mx-auto bg-black border-t-4 dark:border-t dark:border-blue-500 border-blue-600"
       overlayOpacity={0.7}
-      size="95vh"
+      size="80vh"
       lockBackgroundScroll={true}
       style={{
         backgroundColor: isDark ? "rgba(0,0,0,0.8)" : "rgba(255,255,255,0.8)",
@@ -133,15 +133,24 @@ export default function SearchDrawer(props) {
         {/* Search Bar */}
         <div
           className={`${
-            loading && "bg-gray-100 dark:bg-gray-800"
-          } mx-2 mb-6 mt-2 dark:border bg-white dark:bg-black border-r-0 border-gray-400/50 dark:border-gray-700 rounded-full`}
+            loading ? "bg-gray-200 dark:bg-gray-600" : "bg-white dark:bg-black"
+          } mx-2 mb-6 mt-2 dark:border border-r-0 border-gray-400/50 dark:border-gray-700 rounded-full`}
         >
           <div className="flex items-center gap-x-2">
-            <TextInput
+            <input
               placeholder="Search"
-              className="w-full border-none ring-0 shadow-none rounded-full"
+              className={`${
+                loading
+                  ? "bg-gray-200 dark:bg-gray-600"
+                  : "bg-white dark:bg-black"
+              } w-full border-none text-sm text-gray-900 dark:text-white px-4 outline-none rounded-full`}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSearch();
+                }
+              }}
               disabled={loading}
             />
             <Button
