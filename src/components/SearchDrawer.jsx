@@ -155,7 +155,7 @@ export default function SearchDrawer(props) {
             />
             <Button
               size="md"
-              className="py-2 rounded-full pr-1 pl-3"
+              className="py-2 rounded-3xl pr-1 pl-3"
               color="blue"
               variant="primary"
               icon={BiSearch}
