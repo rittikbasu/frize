@@ -26,7 +26,7 @@ export default async function handler(req, res) {
         const { data: documents } = await supabase.rpc('match_documents', {
             query_embedding: embedding,
             match_threshold: 0.80, // Choose an appropriate threshold for your data
-            match_count: 5, // Choose the number of matchesf
+            match_count: 30, // Choose the number of matches
         })
         console.log(documents)
 
@@ -50,7 +50,7 @@ export default async function handler(req, res) {
         }
 
         const systemPrompt = `
-            You are a question answering model that answers questions based on the content of the document that contains a breakdown of time spent on different tasks during the day and the categories of the tasks. Given the following sections from the document, answer the question using only that information, outputted in markdown format.`
+            You are a question answering model that answers questions based on the content of the document that contains a breakdown of time spent on different tasks during the day and the categories of the tasks. Don't show any calculations just the final answer. Given the following data from the document, answer the question using only that information, outputted in html and formatted apropriately.`
         
         const userPrompt = `
             Context sections:
@@ -60,23 +60,9 @@ export default async function handler(req, res) {
             ${query}
             """
 
-            Answer as markdown:
+            Answer as html:
         `
 
-        // const prompt = stripIndent`${oneLine`
-        //     You are a question answering model that answers questions based on the content of the document that contains a breakdown of time spent on different tasks during the day and the categories of the tasks. Given the following sections from the document, answer the question using only that information, outputted in markdown format. If you are unsure and the answer is not explicitly written in the documentation, say "Sorry, I don't the answer to that :(."`}
-
-        //     Context sections:
-        //     ${contextText}
-
-        //     Question: """
-        //     ${query}
-        //     """
-
-        //     Answer as markdown:
-        // `
-
-        // In production we should handle possible errors
         const completionResponse = await openai.createChatCompletion({
             model: 'gpt-3.5-turbo-16k',
             messages: [
