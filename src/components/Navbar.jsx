@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { BsSun, BsMoon } from "react-icons/bs";
-import { Button } from "@tremor/react";
+import { CiFries } from "react-icons/ci";
+import { Button, Icon } from "@tremor/react";
 
-function ModeToggle(props) {
+function ModeToggle() {
   function disableTransitionsTemporarily() {
     document.documentElement.classList.add("[&_*]:!transition-none");
     window.setTimeout(() => {
@@ -19,10 +19,8 @@ function ModeToggle(props) {
 
     if (isDarkMode === isSystemDarkMode) {
       delete window.localStorage.isDarkMode;
-      props.setFries("");
     } else {
       window.localStorage.isDarkMode = isDarkMode;
-      props.setFries("🍟");
     }
   }
   return (
@@ -41,17 +39,20 @@ function ModeToggle(props) {
 }
 
 const Navbar = () => {
-  const [fries, setFries] = useState("");
-
   return (
     <nav className="fixed top-0 left-0 right-0 backdrop-blur-sm z-50 px-4 py-2 flex items-center justify-between max-w-5xl lg:mx-auto">
-      <div className="flex items-center m-2 flex-grow">
-        <div className="text-2xl text-red-400 dark:text-lime-400 font-mono tracking-wider">
-          {fries}frize
+      <div className="flex items-center my-2 flex-grow">
+        <div className="text-2xl text-red-400 flex items-center dark:text-lime-400 font-mono tracking-wider">
+          <Icon
+            className="fill-current text-red-400 dark:text-lime-400 pl-0"
+            icon={CiFries}
+            size="lg"
+          />{" "}
+          frize
         </div>
       </div>
       <div className="flex items-center space-x-2">
-        <ModeToggle setFries={setFries} />
+        <ModeToggle />
       </div>
     </nav>
   );
