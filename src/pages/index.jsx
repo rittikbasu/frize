@@ -1,26 +1,20 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Chart from "@/components/Chart";
+import SearchDrawer from "@/components/SearchDrawer";
 import {
   Title,
-  Flex,
   BarList,
-  Bold,
-  Grid,
-  Col,
   Card,
   Text,
-  Metric,
   DateRangePicker,
   DateRangePickerItem,
   Button,
-  TextInput,
 } from "@tremor/react";
 import { BiSearch } from "react-icons/bi";
 import { timeFormatter } from "@/utils/timeFormatter";
 import { getCategories } from "@/utils/getCategories";
 import { getInsights } from "@/utils/getInsights";
-import Drawer from "react-modern-drawer";
 import "react-modern-drawer/dist/index.css";
 
 export default function Home({
@@ -29,7 +23,6 @@ export default function Home({
   averageHoursData,
   categoryData,
 }) {
-  // const [categoryData, setCategoryData] = useState(getCategories(data));
   const [chartData, setChartData] = useState(data);
   const [totalHours, setTotalHours] = useState(totalHoursData);
   const [averageHours, setAverageHours] = useState(averageHoursData);
@@ -58,6 +51,7 @@ export default function Home({
 
   async function dateChangeHandler(date) {
     console.log(date);
+    // if key === last_work_day
     if (date.selectValue === "Last work day") {
       const request = await fetch(`/api/supabase?type=last_work_day`);
       const response = await request.json();
@@ -113,40 +107,8 @@ export default function Home({
     setIsOpen(false);
   };
 
-  const [isDark, setIsDark] = useState(false);
-  useEffect(() => {
-    setIsDark(document.documentElement.classList.contains("dark"));
-    console.log(isDark);
-  }, [isOpen]);
-
-  // const [query, setQuery] = useState("How many hours worked in May 2023");
-  // const [searchResults, setSearchResults] = useState([]);
-
-  // const handleSearch = async () => {
-  //   try {
-  //     const response = await fetch("/api/semanticSearch", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({ query }),
-  //     });
-
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       console.log(data);
-  //     } else {
-  //       console.error("Error fetching search results");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching search results:", error);
-  //   }
-  // };
-
-  // handleSearch();
-
   return (
-    <div className="max-w-5xl lg:mx-auto flex flex-col items-center gap-y-10 lg:justify-center h-full px-4 my-20 lg:my-26">
+    <div className="max-w-5xl lg:mx-auto flex flex-col items-center gap-y-10 lg:justify-center h-full px-4 my-24 lg:my-26">
       <div className="fixed bottom-8 lg:bottom-6 z-50 w-full text-center">
         <Button
           size="md"
@@ -159,47 +121,10 @@ export default function Home({
           Search
         </Button>
       </div>
-      <Drawer
-        open={isOpen}
-        onClose={closeDrawer}
-        direction="bottom"
-        className="rounded-t-2xl w-full max-w-5xl mx-auto bg-black border-t-4 dark:border-t dark:border-blue-500 border-blue-600"
-        overlayOpacity={0.7}
-        size="80vh"
-        lockBackgroundScroll={true}
-        // make backround transparent
-        style={{
-          backgroundColor: isDark ? "rgba(0,0,0,0.8)" : "rgba(255,255,255,0.8)",
-        }}
-      >
-        <div className="my-4 h-full">
-          <div className="text-center">
-            <Title>AI powered search</Title>
-          </div>
-
-          {/*  text appears on the right side everytime user searches */}
-          <div className="flex flex-col gap-y-4">
-            <Text className="text-center">
-              Search for insights from your data
-            </Text>
-            <Text className="text-center">
-              Try searching for How many hours worked in May 2023
-            </Text>
-          </div>
-
-          <div className="fixed bottom-0 w-full px-4 my-4">
-            <TextInput
-              placeholder="Search"
-              className="w-full"
-              icon={BiSearch}
-            />
-          </div>
-        </div>
-      </Drawer>
       {/* put date range picker and search side by side */}
       <div className="flex flex-col justify-center items-center gap-y-10">
         <DateRangePicker
-          className="max-w-sm mx-auto focus:outline-none px-4"
+          className="max-w-xs lg:max-w-sm mx-auto px-4"
           enableSelect={true}
           enableYearNavigation={true}
           enableClear={true}
@@ -276,15 +201,15 @@ export default function Home({
           <Card className="">
             <Title>Category</Title>
             <BarList
-              data={categoryData}
+              data={categories}
               className="mt-6"
               valueFormatter={timeFormatter}
             />
           </Card>
         </div>
       </div>
+      <SearchDrawer isOpen={isOpen} closeDrawer={closeDrawer} />
     </div>
-    // </div>
   );
 }
 
