@@ -79,6 +79,7 @@ export default function SearchDrawer(props) {
       lockBackgroundScroll={true}
       style={{
         backgroundColor: isDark ? "rgba(0,0,0,0.8)" : "rgba(255,255,255,0.8)",
+        overflow: "hidden",
       }}
       customIdSuffix="search-drawer"
     >
@@ -110,7 +111,7 @@ export default function SearchDrawer(props) {
                 }`}
               >
                 <div
-                  className={`px-4 py-1 rounded-2xl text-sm ${
+                  className={`px-4 py-1.5 rounded-2xl text-sm ${
                     message.isUser
                       ? "bg-blue-500 text-white dark:bg-blue-600"
                       : "bg-zinc-600 text-white dark:bg-gray-600"
@@ -133,7 +134,7 @@ export default function SearchDrawer(props) {
         {/* Search Bar */}
         <div
           className={`${
-            loading ? "bg-gray-200 dark:bg-gray-600" : "bg-white dark:bg-black"
+            loading ? "bg-gray-200 dark:bg-gray-800" : "bg-white dark:bg-black"
           } mx-2 mb-6 mt-2 dark:border dark:border-r-0 border-gray-400/50 dark:border-gray-700 rounded-full`}
         >
           <div className="flex items-center gap-x-2">
@@ -141,10 +142,11 @@ export default function SearchDrawer(props) {
               placeholder="Search"
               className={`${
                 loading
-                  ? "bg-gray-200 dark:bg-gray-600"
+                  ? "bg-gray-200 dark:bg-gray-800"
                   : "bg-white dark:bg-black"
-              } w-full border-none text-sm text-gray-900 dark:text-white pl-4 outline-none rounded-full`}
+              } w-full text-sm text-gray-900 dark:text-white pl-4 outline-none rounded-full`}
               value={query}
+              maxLength={150}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
@@ -154,7 +156,7 @@ export default function SearchDrawer(props) {
               disabled={loading}
             />
             <button
-              className={`p-2 text-white rounded-full ${
+              className={`p-[0.65rem] text-white rounded-full ${
                 loading && "animate-spin opacity-60 cursor-wait"
               } bg-blue-500 dark:bg-blue-700`}
               disabled={loading}
