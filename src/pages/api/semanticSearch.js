@@ -23,7 +23,7 @@ export default async function handler(req, res) {
 
         // In production, you should handle possible errors here
         const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY) // Set your Supabase URL and key as environment variables
-        const { data: documents } = await supabase.rpc('match_documents', {
+        const { data: documents } = await supabase.rpc('match_timelogs', {
             query_embedding: embedding,
             match_threshold: 0.80, // Choose an appropriate threshold for your data
             match_count: 30, // Choose the number of matches
@@ -36,21 +36,21 @@ export default async function handler(req, res) {
         // Concat matched documents
         for (let i = 0; i < documents.length; i++) {
             const document = documents[i]
-            const content = document.raw_data
+            const content = document.gpt_context
             const encoded = encode(content)
             tokenCount += encoded.length
-            console.log(tokenCount)
+            console.log(encoded.length)
 
             // Limit context to max 1500 tokens (configurable)
-            if (tokenCount > 5000) {
-            break
-            }
+            // if (tokenCount > 5000) {
+            // break
+            // }
 
             contextText += `${content.trim()}\n---\n`
         }
 
         const systemPrompt = `
-            You are a question answering model that answers questions based on the content of the document that contains a breakdown of time spent on different tasks during the day and the categories of the tasks. Don't show any calculations just the final answer. Given the following data from the document, answer the question using only that information, outputted in html and formatted apropriately.`
+            You are a question answering model that answers questions based on the content of the time sheet that contains a breakdown of time spent on different tasks during the day and the categories of the tasks. Don't show any calculations just the final answer. Given the following data from the document, answer the question using only that information, outputted in html and formatted appropriately.`
         
         const userPrompt = `
             Context sections:
@@ -62,7 +62,18 @@ export default async function handler(req, res) {
 
             Answer as html:
         `
+        // get total count of tokens in systemPrompt and userPrompt
+        const systemPromptTokens = encode(systemPrompt).length
+        const userPromptTokens = encode(userPrompt).length
+        const totalTokens = systemPromptTokens + userPromptTokens
+        console.log(totalTokens)
 
+        let model = "gpt-3.5-turbo"
+
+        if (totalTokens > 4000) {
+            model = "gpt-3.5-turbo-16k"
+        }
+        console.log(model)
         const completionResponse = await openai.createChatCompletion({
             model: 'gpt-3.5-turbo-16k',
             messages: [
