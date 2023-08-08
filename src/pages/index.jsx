@@ -224,8 +224,10 @@ export const getStaticProps = async () => {
   const endDate = new Date();
   endDate.setDate(endDate.getDate() - 1);
 
-  const { data, error } = await SupabaseAdmin.from("insights")
-    .select("work_hours, focus, breaks, date, categories")
+  const { data, error } = await SupabaseAdmin.from("timelog")
+    .select(
+      "work_hours, focus, breaks, date, categories, work_categories, nonwork_categories"
+    )
     .gte("date", startDate.toISOString().slice(0, 10))
     .lte("date", endDate.toISOString().slice(0, 10))
     .order("date", { ascending: false });

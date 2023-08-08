@@ -37,7 +37,7 @@ export default async (req, res) => {
     } 
     else {
       console.log(req.query.start, req.query.end)
-      const { data } = await SupabaseAdmin.from('insights')
+      const { data } = await SupabaseAdmin.from('timelog')
         .select("work_hours, focus, breaks, date, categories")
         .gte("date", req.query.start)
         .lte("date", req.query.end)
