@@ -2,7 +2,9 @@ import { Card, Title, LineChart } from "@tremor/react";
 import { timeFormatter } from "@/utils/timeFormatter";
 
 export default function Chart(chartData) {
-  console.log(chartData.chartData);
+  const keys = Object.keys(chartData.chartData[0]).filter(
+    (key) => key !== "date" && key !== "categories"
+  );
   return (
     <Card className="">
       <Title>Productivity Graph</Title>
@@ -10,8 +12,8 @@ export default function Chart(chartData) {
         className="mt-6"
         data={chartData.chartData}
         index="date"
-        categories={["work_hours", "focus", "breaks"]}
-        colors={["lime", "gray", "orange"]}
+        categories={keys}
+        colors={["lime", "gray", "orange", "pink", "violet"]}
         valueFormatter={timeFormatter}
         yAxisWidth={26}
         // showLegend={false}
