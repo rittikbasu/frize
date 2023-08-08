@@ -1,4 +1,4 @@
-import { Html, Head, Main, NextScript } from 'next/document'
+import { Html, Head, Main, NextScript } from "next/document";
 
 const modeScript = `
   let darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
@@ -33,17 +33,17 @@ const modeScript = `
     disableTransitionsTemporarily()
     updateMode()
   }
-`
+`;
 
 export default function Document() {
   return (
-    <Html lang="en" className='h-full antialiased'>
+    <Html lang="en" className="h-full antialiased">
       <Head />
       <script dangerouslySetInnerHTML={{ __html: modeScript }} />
-      <body className="flex h-full flex-col bg-zinc-50 dark:bg-black">
+      <body className="flex h-full flex-col bg-white dark:bg-black">
         <Main />
         <NextScript />
       </body>
     </Html>
-  )
+  );
 }
