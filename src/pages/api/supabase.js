@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { getInsights } from '@/utils/getInsights'
 import { getCategories } from '@/utils/getCategories'
+import { getDaysData } from '@/utils/getDaysData'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseServerKey = process.env.SUPABASE_SERVICE_KEY || ''
@@ -20,7 +21,7 @@ export default async (req, res) => {
   if (req.method === 'GET') {
     let data;
     if (req.query.type === 'last_work_day') {
-      const { data } = await SupabaseAdmin.from('insights')
+      const { data } = await SupabaseAdmin.from('timelog')
         .select("work_hours, focus, breaks, date, categories")
         .order("date", { ascending: false })
         .limit(1);
@@ -36,21 +37,26 @@ export default async (req, res) => {
         })
     } 
     else {
-      console.log(req.query.start, req.query.end)
+      console.log(req.query.start, req.query.end, req.query.days)
       const { data } = await SupabaseAdmin.from('timelog')
-        .select("work_hours, focus, breaks, date, categories")
+        .select("work_hours, focus, breaks, date, categories, nonwork_categories, day")
         .gte("date", req.query.start)
         .lte("date", req.query.end)
         .order("date", { ascending: false });
-      const insightsData = getInsights(data);
+      const insightsData = getInsights(data, req.query.days);
       const totalHoursData = insightsData.slice(0, 3);
       const averageHoursData = insightsData.slice(3, 6);
       const categoryData = getCategories(data);
+      const averageWorkWeek = insightsData[6].value;
+      const daysData = getDaysData(data);
+      console.log(daysData)
     return res.status(200).json({
         data: processData(data) || null,
         totalHoursData: totalHoursData || null,
         averageHoursData: averageHoursData || null,
         categoryData: categoryData || null,
+        averageWorkWeek: averageWorkWeek || null,
+        daysData: daysData || null,
       })
     }
   }

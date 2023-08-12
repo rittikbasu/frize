@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import Chart from "@/components/Chart";
+import { Donut } from "@/components/Donut";
 import SearchDrawer from "@/components/SearchDrawer";
 import {
   Title,
@@ -15,6 +16,8 @@ import { BiSearch } from "react-icons/bi";
 import { timeFormatter } from "@/utils/timeFormatter";
 import { getCategories } from "@/utils/getCategories";
 import { getInsights } from "@/utils/getInsights";
+import { getTotalDays } from "@/utils/getTotalDays";
+import { getDaysData } from "@/utils/getDaysData";
 import "react-modern-drawer/dist/index.css";
 
 export default function Home({
@@ -22,11 +25,14 @@ export default function Home({
   totalHoursData,
   averageHoursData,
   categoryData,
+  averageWorkWeek,
+  sevenDaysData,
 }) {
   const [chartData, setChartData] = useState(data);
   const [totalHours, setTotalHours] = useState(totalHoursData);
   const [averageHours, setAverageHours] = useState(averageHoursData);
   const [categories, setCategories] = useState(categoryData);
+  const [daysData, setDaysData] = useState(sevenDaysData);
 
   // from date should be 1 month before to date
   const fromDate = new Date();
@@ -40,14 +46,6 @@ export default function Home({
   const [totalDays, setTotalDays] = useState(getTotalDays(fromDate, toDate));
   const last7Days = new Date();
   last7Days.setDate(last7Days.getDate() - 7);
-
-  function getTotalDays(fromDate, toDate) {
-    console.log(fromDate, toDate);
-    const oneDay = 24 * 60 * 60 * 1000;
-    const diffDays = Math.round(Math.abs((fromDate - toDate) / oneDay) + 1);
-    return diffDays;
-  }
-  console.log(totalDays);
 
   async function dateChangeHandler(date) {
     console.log(date);
@@ -84,16 +82,16 @@ export default function Home({
         const request = await fetch(
           `/api/supabase?start=${start.toISOString().slice(0, 10)}&end=${end
             .toISOString()
-            .slice(0, 10)}`
+            .slice(0, 10)}&days=${getTotalDays(start, end)}`
         );
         const response = await request.json();
         setChartData(response.data);
         setTotalHours(response.totalHoursData);
         setAverageHours(response.averageHoursData);
         setCategories(response.categoryData);
-        console.log(categories);
-        console.log(start, end);
         setTotalDays(getTotalDays(start, end));
+        setDaysData(response.daysData);
+        console.log(response.daysData);
       }
     }
   }
@@ -108,7 +106,7 @@ export default function Home({
   };
 
   return (
-    <div className="max-w-5xl lg:mx-auto flex flex-col items-center gap-y-10 lg:justify-center h-full px-4 my-24 lg:my-26">
+    <div className="max-w-5xl lg:mx-auto flex flex-col items-center gap-y-10 lg:justify-center h-full px-4 my-24 lg:mt-36">
       <div className="fixed bottom-8 lg:bottom-6 z-50 w-full text-center">
         <Button
           size="md"
@@ -162,6 +160,16 @@ export default function Home({
         </DateRangePicker>
       </div>
       <Chart chartData={chartData} />
+      {totalDays > 1 && (
+        <Card className="w-full lg:order-none order-last -mt-10 lg:mt-0">
+          <Title>Days</Title>
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-none lg:grid-flow-col gap-4">
+            {daysData.map((day) => (
+              <Donut data={day} key={day.day} />
+            ))}
+          </div>
+        </Card>
+      )}
       <div className="lg:grid lg:grid-rows-3 grid-flow-col gap-y-10 space-y-10 lg:space-y-0 gap-x-4 w-full">
         <div className="lg:col-span-1">
           <Card className="">
@@ -175,8 +183,8 @@ export default function Home({
               valueFormatter={timeFormatter}
             />
             {totalDays > 1 && (
-              <Text className="mt-6 dark:font-medium">
-                Did not work for {totalDays - chartData.length} days out of{" "}
+              <Text className="mt-6 ">
+                did not work for {totalDays - chartData.length} out of{" "}
                 {totalDays} days
               </Text>
             )}
@@ -191,9 +199,11 @@ export default function Home({
                 className="mt-6"
                 valueFormatter={timeFormatter}
               />
-              {/* <Text className="mt-6 dark:font-medium">
-                Worked for {getAverageWorkWeek(chartData)} a week on average
-              </Text> */}
+              {totalDays > 1 && (
+                <Text className="mt-6">
+                  worked for {averageWorkWeek} out of 5 days on average
+                </Text>
+              )}
             </Card>
           </div>
         )}
@@ -226,7 +236,7 @@ export const getStaticProps = async () => {
 
   const { data, error } = await SupabaseAdmin.from("timelog")
     .select(
-      "work_hours, focus, breaks, date, categories, work_categories, nonwork_categories"
+      "work_hours, focus, breaks, date, categories, work_categories, nonwork_categories, day"
     )
     .gte("date", startDate.toISOString().slice(0, 10))
     .lte("date", endDate.toISOString().slice(0, 10))
@@ -246,10 +256,12 @@ export const getStaticProps = async () => {
     data.reverse();
   }
 
-  const insightsData = getInsights(data);
+  const insightsData = getInsights(data, getTotalDays(startDate, endDate));
   const totalHoursData = insightsData.slice(0, 3);
   const averageHoursData = insightsData.slice(3, 6);
   const categoryData = getCategories(data);
+  const averageWorkWeek = insightsData[6].value;
+  const daysData = getDaysData(data);
 
   return {
     props: {
@@ -257,6 +269,8 @@ export const getStaticProps = async () => {
       totalHoursData: totalHoursData,
       averageHoursData: averageHoursData,
       categoryData: categoryData,
+      averageWorkWeek: averageWorkWeek,
+      sevenDaysData: daysData,
     },
     revalidate: 1,
   };
