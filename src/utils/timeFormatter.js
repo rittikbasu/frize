@@ -1,4 +1,4 @@
-export function timeFormatter(total_hours) {
+export function timeFormatter(total_hours, short = false) {
   // Calculate the hours and minutes
   const hours = Math.floor(total_hours);
   const minutes = Math.floor((total_hours - hours) * 60);
@@ -11,6 +11,10 @@ export function timeFormatter(total_hours) {
     time_str = `${hours} hr`;
   } else {
     time_str = `${hours} hr ${minutes} min`;
+  }
+
+  if (short) {
+    time_str = time_str.replace("hr", "h").replace("min", "m");
   }
 
   return time_str;
