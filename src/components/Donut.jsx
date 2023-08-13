@@ -12,7 +12,7 @@ export function Donut({ data }) {
         index="name"
         valueFormatter={timeFormatter}
         label={timeFormatter(data.data[0].value, true)}
-        colors={["slate", "lime", "stone"]}
+        colors={["slate", "lime", "stone", "indigo"]}
       />
       <Text className="dark:font-medium">{data.day}</Text>
     </div>
