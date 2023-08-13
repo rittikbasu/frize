@@ -20,11 +20,15 @@ export function getCategories(data) {
     }
 
     // Convert the object back to an array of objects
-    const uniqueNamesArray = Object.keys(uniqueNamesMap).map((name) => ({
-    // add the percentage of time spent on each category rounded to 2 decimal places
-    name: `${name} → ${Math.round((uniqueNamesMap[name] / total_work_hours) * 100)}%`,
-    value: uniqueNamesMap[name],
-    }));
+    const uniqueNamesArray = Object.keys(uniqueNamesMap).map((name) => {
+        const percentage = (uniqueNamesMap[name] / total_work_hours) * 100;
+        const roundedPercentage = percentage < 10 ? Math.round(percentage * 10) / 10 : Math.round(percentage);
+    
+        return {
+            name: `${name} → ${roundedPercentage}%`,
+            value: uniqueNamesMap[name],
+        };
+    });
 
     // Sort the array by the value property
     uniqueNamesArray.sort((a, b) => b.value - a.value);
