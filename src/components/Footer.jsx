@@ -31,7 +31,7 @@ function SocialLinkMobile({ className, icon: Icon, ...props }) {
 
 export function Footer() {
   return (
-    <footer className="mt-24 z-30 max-w-5xl mx-auto">
+    <footer id="footer" className="mt-24 z-30 max-w-5xl mx-auto">
       {/* <Container.Outer> */}
       <div className="border-t border-zinc-100 bg-white py-8 md:py-10 px-4 dark:border-zinc-700/40 dark:bg-black">
         {/* <Container.Inner> */}
