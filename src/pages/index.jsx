@@ -25,12 +25,13 @@ export default function Home({
   totalHoursData,
   averageHoursData,
   categoryData,
-  averageWorkWeek,
+  averageWorkWeekData,
   sevenDaysData,
 }) {
   const [chartData, setChartData] = useState(data);
   const [totalHours, setTotalHours] = useState(totalHoursData);
   const [averageHours, setAverageHours] = useState(averageHoursData);
+  const [averageWorkWeek, setAverageWorkWeek] = useState(averageWorkWeekData);
   const [categories, setCategories] = useState(categoryData);
   const [daysData, setDaysData] = useState(sevenDaysData);
 
@@ -48,8 +49,6 @@ export default function Home({
   last7Days.setDate(last7Days.getDate() - 7);
 
   async function dateChangeHandler(date) {
-    console.log(date);
-    // if key === last_work_day
     if (date.selectValue === "Last work day") {
       const request = await fetch(`/api/supabase?type=last_work_day`);
       const response = await request.json();
@@ -88,6 +87,7 @@ export default function Home({
         setChartData(response.data);
         setTotalHours(response.totalHoursData);
         setAverageHours(response.averageHoursData);
+        setAverageWorkWeek(response.averageWorkWeek);
         setCategories(response.categoryData);
         setTotalDays(getTotalDays(start, end));
         setDaysData(response.daysData);
@@ -105,20 +105,35 @@ export default function Home({
     setIsOpen(false);
   };
 
+  // logic to hide search button when footer is visible
+  const [isSearchBarVisible, setIsSearchBarVisible] = useState(true);
+  useEffect(() => {
+    const handleScroll = () => {
+      const searchButton = document.getElementById("searchButton"); // Add an ID to the search button
+      const footer = document.getElementById("footer"); // Add an ID to the footer element
+
+      if (searchButton && footer) {
+        const searchButtonRect = searchButton.getBoundingClientRect();
+        const footerRect = footer.getBoundingClientRect();
+
+        if (searchButtonRect.bottom >= footerRect.top) {
+          // console.log(searchButtonRect.bottom, footerRect.top);
+          setIsSearchBarVisible(false);
+        } else if (searchButtonRect.bottom < footerRect.top) {
+          // console.log(searchButtonRect.bottom, footerRect.top);
+          setIsSearchBarVisible(true);
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   return (
     <div className="max-w-5xl lg:mx-auto flex flex-col items-center gap-y-10 lg:justify-center h-full px-4 my-24 lg:mt-36">
-      <div className="fixed bottom-8 lg:bottom-6 z-50 w-full text-center">
-        <Button
-          size="md"
-          icon={BiSearch}
-          className="border dark:border-gray-800 border-gray-200 rounded-2xl py-1 px-4 dark:bg-black/30 bg-white/30 backdrop-blur"
-          color="blue"
-          variant="light"
-          onClick={openDrawer}
-        >
-          Search
-        </Button>
-      </div>
       {/* put date range picker and search side by side */}
       <div className="flex flex-col justify-center items-center gap-y-10">
         <DateRangePicker
@@ -162,7 +177,7 @@ export default function Home({
       <Chart chartData={chartData} />
       {totalDays > 1 && (
         <Card className="w-full lg:order-none order-last -mt-10 lg:mt-0">
-          <Title>Days</Title>
+          <Title>Day Based Trends</Title>
           <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-none lg:grid-flow-col gap-4">
             {daysData.map((day) => (
               <Donut data={day} key={day.day} />
@@ -170,7 +185,7 @@ export default function Home({
           </div>
         </Card>
       )}
-      <div className="lg:grid lg:grid-rows-3 grid-flow-col gap-y-10 space-y-10 lg:space-y-0 gap-x-4 w-full">
+      <div className="lg:grid lg:grid-rows-2 grid-flow-col gap-y-10 space-y-10 lg:space-y-0 gap-x-4 w-full">
         <div className="lg:col-span-1">
           <Card className="">
             <Title>Insights</Title>
@@ -199,9 +214,9 @@ export default function Home({
                 className="mt-6"
                 valueFormatter={timeFormatter}
               />
-              {totalDays > 1 && (
+              {totalDays > 6 && (
                 <Text className="mt-6">
-                  worked for {averageWorkWeek} out of 5 days on average
+                  worked for {averageWorkWeek} days a week
                 </Text>
               )}
             </Card>
@@ -217,6 +232,23 @@ export default function Home({
             />
           </Card>
         </div>
+      </div>
+      <div
+        id="searchButton"
+        className={`fixed bottom-8 lg:bottom-6 order-last z-50 w-full text-center`}
+      >
+        {isSearchBarVisible && (
+          <Button
+            size="md"
+            icon={BiSearch}
+            className="border dark:border-gray-800 border-gray-200 rounded-full py-1 px-4 dark:bg-black/30 bg-white/30 backdrop-blur"
+            color="blue"
+            variant="light"
+            onClick={openDrawer}
+          >
+            Search
+          </Button>
+        )}
       </div>
       <SearchDrawer isOpen={isOpen} closeDrawer={closeDrawer} />
     </div>
@@ -269,7 +301,7 @@ export const getStaticProps = async () => {
       totalHoursData: totalHoursData,
       averageHoursData: averageHoursData,
       categoryData: categoryData,
-      averageWorkWeek: averageWorkWeek,
+      averageWorkWeekData: averageWorkWeek,
       sevenDaysData: daysData,
     },
     revalidate: 1,
