@@ -20,7 +20,7 @@ export function getInsights(data, total_days) {
     const avg_focus = Math.round((total_focus / total_work_days) * 100) / 100;
     const avg_breaks = Math.round((total_breaks / total_work_days) * 100) / 100;
 
-    const weeks = total_days / 5;
+    const weeks = total_days / 7;
     const average_work_week = Math.round(total_work_days / weeks);
     console.log(average_work_week);
 
