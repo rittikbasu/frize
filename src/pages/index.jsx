@@ -259,7 +259,9 @@ export default function Home({
             <BarList
               data={categories}
               className="mt-6"
-              valueFormatter={(value) => timeFormatter(value, restrictAccess)}
+              valueFormatter={(value) =>
+                timeFormatter(value, false, restrictAccess)
+              }
             />
           </Card>
         </div>
