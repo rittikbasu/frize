@@ -34,7 +34,7 @@ export function getCategories(data, restrictAccess = false) {
     // Sort the array by the value property
     uniqueNamesArray.sort((a, b) => b.value - a.value);
 
-    if (restrictAccess === true) {
+    if (restrictAccess) {
         // change the names to random names after the first 3 categories
         for (let i = 3; i < uniqueNamesArray.length; i++) {
             // get the percentage of the category from uniqueNamesArray[i].name

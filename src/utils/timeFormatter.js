@@ -1,7 +1,6 @@
 export function timeFormatter(total_hours, short = false, restrictAccess = false, isRittik = true) {
-  console.log(isRittik)
   if (!isRittik) return "🚫";
-  if (restrictAccess === true) return "🚫";
+  if (restrictAccess) return "🚫";
   // Calculate the hours and minutes
   const hours = Math.floor(total_hours);
   const minutes = Math.floor((total_hours - hours) * 60);

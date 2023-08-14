@@ -222,7 +222,9 @@ export default function Home({
             <BarList
               data={totalHours}
               className="mt-6"
-              valueFormatter={(value) => timeFormatter(value, restrictAccess)}
+              valueFormatter={(value) =>
+                timeFormatter(value, false, restrictAccess)
+              }
             />
             {totalDays > 1 && (
               <Text className="mt-6 ">
