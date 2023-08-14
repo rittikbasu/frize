@@ -12,7 +12,7 @@ export default function handler(req, res) {
 
     if (ip.includes("127.0.0.1") || ip.includes("::1") || ip === "localhost") {
         res.status(200).json({ isRittik: true });
-    } else if (ip === "43.204.117.87") {
+    } else if (ip === static_ip) {
         res.status(200).json({ isRittik: true });
     } else {
         res.status(200).json({ isRittik: false });
