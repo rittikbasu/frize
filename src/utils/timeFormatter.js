@@ -1,4 +1,5 @@
-export function timeFormatter(total_hours, short = false) {
+export function timeFormatter(total_hours, restrictAccess = false, short = false) {
+  if (restrictAccess === true) return "🚫";
   // Calculate the hours and minutes
   const hours = Math.floor(total_hours);
   const minutes = Math.floor((total_hours - hours) * 60);

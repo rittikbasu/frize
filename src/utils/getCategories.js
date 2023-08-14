@@ -1,4 +1,5 @@
-export function getCategories(data) {      
+export function getCategories(data, restrictAccess = false) { 
+    console.log(restrictAccess)     
     const flatArray = data.flatMap((obj) => obj.categories);
 
     // Create an object to store unique names as keys and their times as values
@@ -32,6 +33,15 @@ export function getCategories(data) {
 
     // Sort the array by the value property
     uniqueNamesArray.sort((a, b) => b.value - a.value);
+
+    if (restrictAccess) {
+        // change the names to random names after the first 3 categories
+        for (let i = 3; i < uniqueNamesArray.length; i++) {
+            // get the percentage of the category from uniqueNamesArray[i].name
+            const percentage = uniqueNamesArray[i].name.split("→")[1].split("%")[0].trim();
+            uniqueNamesArray[i].name = `Category ${i + 1} → ${percentage}%`;
+        }
+    }
 
     return uniqueNamesArray
     

@@ -37,7 +37,7 @@ export default async (req, res) => {
         })
     } 
     else {
-      console.log(req.query.start, req.query.end, req.query.days)
+      console.log(req.query.start, req.query.end, req.query.days, req.query.restrictAccess)
       const { data } = await SupabaseAdmin.from('timelog')
         .select("work_hours, focus, breaks, date, categories, nonwork_categories, day")
         .gte("date", req.query.start)
@@ -46,10 +46,9 @@ export default async (req, res) => {
       const insightsData = getInsights(data, req.query.days);
       const totalHoursData = insightsData.slice(0, 3);
       const averageHoursData = insightsData.slice(3, 6);
-      const categoryData = getCategories(data);
+      const categoryData = getCategories(data, req.query.restrictAccess);
       const averageWorkWeek = insightsData[6].value;
       const daysData = getDaysData(data);
-      console.log(daysData)
     return res.status(200).json({
         data: processData(data) || null,
         totalHoursData: totalHoursData || null,

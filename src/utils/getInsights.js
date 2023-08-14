@@ -1,4 +1,4 @@
-export function getInsights(data, total_days) {
+export function getInsights(data, total_days, restrictAccess=false) {
   let total_work_hours = 0;
     let total_focus = 0;
     let total_breaks = 0;
@@ -22,17 +22,16 @@ export function getInsights(data, total_days) {
 
     const weeks = total_days / 7;
     const average_work_week = Math.round(total_work_days / weeks);
-    console.log(average_work_week);
 
 
     return ([
-      { name: `Total Work Hours → ${percent_work}%`, value: total_work_hours },
-      { name: `Total Focus Time → ${percent_focus}%`, value: total_focus },
-      { name: `Total Breaks → ${percent_breaks}%`, value: total_breaks },
-      { name: `Average Work Hours`, value: avg_work_hours },
-      { name: `Average Focus Time`, value: avg_focus },
-      { name: `Average Breaks`, value: avg_breaks },
-      { name: `Average Days Worked`, value: average_work_week },
+      { name: `Total Work Hours → ${percent_work}%`, value: restrictAccess ? "🚫" : total_work_hours },
+      { name: `Total Focus Time → ${percent_focus}%`, value: restrictAccess ? "🚫" : total_focus },
+      { name: `Total Breaks → ${percent_breaks}%`, value: restrictAccess ? "🚫" : total_breaks },
+      { name: `Average Work Hours`, value: restrictAccess ? "🚫" : avg_work_hours },
+      { name: `Average Focus Time`, value: restrictAccess ? "🚫" : avg_focus },
+      { name: `Average Breaks`, value: restrictAccess ? "🚫" : avg_breaks },
+      { name: `Average Days Worked`, value: restrictAccess ? "🚫" : average_work_week },
     ]
     );
 }

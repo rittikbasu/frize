@@ -2,7 +2,6 @@ import { DonutChart, Text } from "@tremor/react";
 import { timeFormatter } from "@/utils/timeFormatter";
 
 export function Donut({ data }) {
-  console.log(data.data);
   return (
     <div className="flex flex-col items-center gap-y-2">
       <DonutChart
@@ -11,7 +10,7 @@ export function Donut({ data }) {
         // category="sales"
         index="name"
         valueFormatter={timeFormatter}
-        label={timeFormatter(data.data[0].value, true)}
+        label={timeFormatter(data.data[0].value, false, true)}
         colors={["slate", "lime", "stone", "indigo"]}
       />
       <Text className="dark:font-medium">{data.day}</Text>

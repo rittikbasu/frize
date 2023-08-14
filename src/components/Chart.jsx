@@ -1,11 +1,18 @@
 import { Card, Title, LineChart } from "@tremor/react";
 import { timeFormatter } from "@/utils/timeFormatter";
 
-export default function Chart(chartData) {
+export default function Chart({ chartData, restrictAccess }) {
   // change the names of keys in the object chartData to uppercase
-  const data = chartData.chartData.map((item) => {
+  const unwantedKeys = ["categories", "work_categories", "day"];
+  const colors = ["lime", "gray", "orange", "violet"];
+  if (restrictAccess) {
+    unwantedKeys.push("focus");
+    colors.splice(1, 1);
+  }
+  const data = chartData.map((item) => {
     const newItem = {};
     Object.keys(item).forEach((key) => {
+      if (unwantedKeys.includes(key)) return;
       let newKey;
       if (key === "nonwork_categories") {
         newKey = "Non-work hours";
@@ -20,17 +27,8 @@ export default function Chart(chartData) {
     });
     return newItem;
   });
-
-  console.log(data);
-
-  const keys = Object.keys(data[0]).filter(
-    (key) =>
-      key !== "Date" &&
-      key !== "Categories" &&
-      key !== "Work Categories" &&
-      key !== "Day"
-  );
-
+  // get keys
+  const keys = Object.keys(data[0]).filter((key) => key !== "Date");
   return (
     <Card className="">
       <Title>Productivity Graph</Title>
@@ -39,15 +37,14 @@ export default function Chart(chartData) {
         data={data}
         index="Date"
         categories={keys}
-        colors={["lime", "gray", "orange", "violet"]}
+        colors={colors}
         valueFormatter={timeFormatter}
         yAxisWidth={26}
         // showLegend={false}
         curveType="monotone"
-        // showYAxis={false}
-        // showXAxis={false}
-        // showTooltip={false}
-        // showGridLines={false}
+        showYAxis={!restrictAccess}
+        showTooltip={!restrictAccess}
+        startEndOnly={restrictAccess}
       />
     </Card>
   );

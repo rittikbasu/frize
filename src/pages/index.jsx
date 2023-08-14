@@ -34,6 +34,22 @@ export default function Home({
   const [averageWorkWeek, setAverageWorkWeek] = useState(averageWorkWeekData);
   const [categories, setCategories] = useState(categoryData);
   const [daysData, setDaysData] = useState(sevenDaysData);
+  const [restrictAccess, setRestrictAccess] = useState(false);
+
+  const [isRittik, setIsRittik] = useState(false);
+  useEffect(() => {
+    async function fetchIsRittik() {
+      try {
+        const response = await fetch("/api/ip");
+        const data = await response.json();
+        setIsRittik(data.isRittik);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    fetchIsRittik();
+  }, []);
 
   // from date should be 1 month before to date
   const fromDate = new Date();
@@ -49,6 +65,13 @@ export default function Home({
   last7Days.setDate(last7Days.getDate() - 7);
 
   async function dateChangeHandler(date) {
+    if (!isRittik) {
+      if (date.selectValue === "All time") {
+        setRestrictAccess(true);
+      } else {
+        setRestrictAccess(false);
+      }
+    }
     if (date.selectValue === "Last work day") {
       const request = await fetch(`/api/supabase?type=last_work_day`);
       const response = await request.json();
@@ -81,7 +104,9 @@ export default function Home({
         const request = await fetch(
           `/api/supabase?start=${start.toISOString().slice(0, 10)}&end=${end
             .toISOString()
-            .slice(0, 10)}&days=${getTotalDays(start, end)}`
+            .slice(0, 10)}&days=${getTotalDays(start, end)}&restrictAccess=${
+            date.selectValue === "All time" ? true : false
+          }`
         );
         const response = await request.json();
         setChartData(response.data);
@@ -91,7 +116,7 @@ export default function Home({
         setCategories(response.categoryData);
         setTotalDays(getTotalDays(start, end));
         setDaysData(response.daysData);
-        console.log(response.daysData);
+        // console.log(response.daysData);
       }
     }
   }
@@ -109,8 +134,8 @@ export default function Home({
   const [isSearchBarVisible, setIsSearchBarVisible] = useState(true);
   useEffect(() => {
     const handleScroll = () => {
-      const searchButton = document.getElementById("searchButton"); // Add an ID to the search button
-      const footer = document.getElementById("footer"); // Add an ID to the footer element
+      const searchButton = document.getElementById("searchButton");
+      const footer = document.getElementById("footer");
 
       if (searchButton && footer) {
         const searchButtonRect = searchButton.getBoundingClientRect();
@@ -145,7 +170,7 @@ export default function Home({
           selectPlaceholder="Select"
           value={dateInput}
           onValueChange={dateChangeHandler}
-          minDate={new Date("2022-12-24")}
+          minDate={isRittik ? new Date("2022-12-25") : fromDate}
           maxDate={toDate}
           defaultValue={dateInput}
           color="lime"
@@ -174,9 +199,9 @@ export default function Home({
           />
         </DateRangePicker>
       </div>
-      <Chart chartData={chartData} />
-      {totalDays > 1 && (
-        <Card className="w-full lg:order-none order-last -mt-10 lg:mt-0">
+      <Chart chartData={chartData} restrictAccess={restrictAccess} />
+      {totalDays > 1 && isRittik && (
+        <Card className="w-full md:order-none order-last -mt-10 md:mt-0">
           <Title>Day Based Trends</Title>
           <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-none lg:grid-flow-col gap-4">
             {daysData.map((day) => (
@@ -185,8 +210,8 @@ export default function Home({
           </div>
         </Card>
       )}
-      <div className="lg:grid lg:grid-rows-2 grid-flow-col gap-y-10 space-y-10 lg:space-y-0 gap-x-4 w-full">
-        <div className="lg:col-span-1">
+      <div className="md:grid grid-flow-col gap-y-10 space-y-10 md:space-y-0 gap-x-4 w-full">
+        <div className="md:col-span-1">
           <Card className="">
             <Title>Insights</Title>
             <Text className="mt-2">
@@ -195,7 +220,7 @@ export default function Home({
             <BarList
               data={totalHours}
               className="mt-6"
-              valueFormatter={timeFormatter}
+              valueFormatter={(value) => timeFormatter(value, restrictAccess)}
             />
             {totalDays > 1 && (
               <Text className="mt-6 ">
@@ -206,29 +231,29 @@ export default function Home({
           </Card>
         </div>
         {chartData.length > 1 && (
-          <div className="lg:col-span-1">
+          <div className="md:col-span-1">
             <Card className="">
               <Title>Average</Title>
               <BarList
                 data={averageHours}
                 className="mt-6"
-                valueFormatter={timeFormatter}
+                valueFormatter={(value) => timeFormatter(value, restrictAccess)}
               />
               {totalDays > 6 && (
                 <Text className="mt-6">
-                  worked for {averageWorkWeek} days a week
+                  worked for {averageWorkWeek} days a week on average
                 </Text>
               )}
             </Card>
           </div>
         )}
-        <div className="lg:row-span-3 lg:col-span-2">
+        <div className="md:row-span-3 md:col-span-2">
           <Card className="">
             <Title>Category</Title>
             <BarList
               data={categories}
               className="mt-6"
-              valueFormatter={timeFormatter}
+              valueFormatter={(value) => timeFormatter(value, restrictAccess)}
             />
           </Card>
         </div>
