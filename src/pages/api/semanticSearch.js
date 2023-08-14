@@ -25,11 +25,14 @@ export default async function handler(req, res) {
         const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY) // Set your Supabase URL and key as environment variables
         const { data: documents } = await supabase.rpc('match_timelogs', {
             query_embedding: embedding,
-            match_threshold: 0.80, // Choose an appropriate threshold for your data
+            match_threshold: 0.81, // Choose an appropriate threshold for your data
             match_count: 30, // Choose the number of matches
         })
         console.log(documents)
 
+        if (documents.length === 0) {
+            return res.status(200).json([])
+        }
         let tokenCount = 0
         let contextText = ''
 

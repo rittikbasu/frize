@@ -48,8 +48,12 @@ export default function SearchDrawer(props) {
       });
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
-        aiResponse = JSON.parse(data).choices[0].message.content;
+        console.log("this", data);
+        if (data.length === 0) {
+          aiResponse = "Sorry, I couldn't find anything";
+        } else {
+          aiResponse = JSON.parse(data).choices[0].message.content;
+        }
       } else {
         console.error("Error fetching search results");
         aiResponse = "Sorry, I'm having trouble fetching the results";
