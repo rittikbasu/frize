@@ -214,9 +214,11 @@ export default function Home({
         <div className="md:col-span-1">
           <Card className="">
             <Title>Insights</Title>
-            <Text className="mt-2">
-              Showing data for {chartData.length} days
-            </Text>
+            {isRittik && (
+              <Text className="mt-2">
+                Showing data for {chartData.length} days
+              </Text>
+            )}
             <BarList
               data={totalHours}
               className="mt-6"
@@ -224,7 +226,8 @@ export default function Home({
             />
             {totalDays > 1 && (
               <Text className="mt-6 ">
-                did not work for {totalDays - chartData.length} out of{" "}
+                did not work for{" "}
+                {isRittik ? totalDays - chartData.length : "🏖️"} out of{" "}
                 {totalDays} days
               </Text>
             )}
@@ -233,15 +236,18 @@ export default function Home({
         {chartData.length > 1 && (
           <div className="md:col-span-1">
             <Card className="">
-              <Title>Average</Title>
+              <Title>Averages</Title>
               <BarList
                 data={averageHours}
                 className="mt-6"
-                valueFormatter={(value) => timeFormatter(value, restrictAccess)}
+                valueFormatter={(value) =>
+                  timeFormatter(value, false, restrictAccess, isRittik)
+                }
               />
               {totalDays > 6 && (
                 <Text className="mt-6">
-                  worked for {averageWorkWeek} days a week on average
+                  worked for {isRittik ? averageWorkWeek : "👨🏾‍💻"} days a week on
+                  average
                 </Text>
               )}
             </Card>
