@@ -1,5 +1,4 @@
 export function getDaysData(data) {
-    console.log(data);
     let days = [];
     for (let i = 0; i < data.length; i++) {
         let day = data[i].day;
