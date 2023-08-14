@@ -9,7 +9,7 @@ function NavLink({ href, children }) {
   return (
     <Link
       href={href}
-      className="font-poppins transition md:hover:text-orange-500 md:dark:hover:text-lime-400"
+      className="tracking-wider transition md:hover:text-orange-500 md:dark:hover:text-lime-400"
     >
       {children}
     </Link>
