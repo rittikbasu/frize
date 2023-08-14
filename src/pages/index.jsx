@@ -35,8 +35,8 @@ export default function Home({
   const [categories, setCategories] = useState(categoryData);
   const [daysData, setDaysData] = useState(sevenDaysData);
   const [restrictAccess, setRestrictAccess] = useState(false);
-
   const [isRittik, setIsRittik] = useState(false);
+
   useEffect(() => {
     async function fetchIsRittik() {
       try {
@@ -65,12 +65,11 @@ export default function Home({
   last7Days.setDate(last7Days.getDate() - 7);
 
   async function dateChangeHandler(date) {
+    let currentRestrictAccess = restrictAccess;
     if (!isRittik) {
-      if (date.selectValue === "All time") {
-        setRestrictAccess(true);
-      } else {
-        setRestrictAccess(false);
-      }
+      console.log("Not Rittik");
+      currentRestrictAccess = date.selectValue === "All time";
+      setRestrictAccess(currentRestrictAccess);
     }
     if (date.selectValue === "Last work day") {
       const request = await fetch(`/api/supabase?type=last_work_day`);
@@ -104,9 +103,10 @@ export default function Home({
         const request = await fetch(
           `/api/supabase?start=${start.toISOString().slice(0, 10)}&end=${end
             .toISOString()
-            .slice(0, 10)}&days=${getTotalDays(start, end)}&restrictAccess=${
-            date.selectValue === "All time" ? true : false
-          }`
+            .slice(0, 10)}&days=${getTotalDays(
+            start,
+            end
+          )}&restrictAccess=${currentRestrictAccess}`
         );
         const response = await request.json();
         setChartData(response.data);

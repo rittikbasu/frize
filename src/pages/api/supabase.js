@@ -46,7 +46,7 @@ export default async (req, res) => {
       const insightsData = getInsights(data, req.query.days);
       const totalHoursData = insightsData.slice(0, 3);
       const averageHoursData = insightsData.slice(3, 6);
-      const categoryData = getCategories(data, req.query.restrictAccess);
+      const categoryData = getCategories(data, JSON.parse(req.query.restrictAccess));
       const averageWorkWeek = insightsData[6].value;
       const daysData = getDaysData(data);
     return res.status(200).json({

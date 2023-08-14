@@ -1,5 +1,4 @@
-export function getCategories(data, restrictAccess = false) { 
-    console.log(restrictAccess)     
+export function getCategories(data, restrictAccess = false) {  
     const flatArray = data.flatMap((obj) => obj.categories);
 
     // Create an object to store unique names as keys and their times as values
@@ -33,7 +32,6 @@ export function getCategories(data, restrictAccess = false) {
 
     // Sort the array by the value property
     uniqueNamesArray.sort((a, b) => b.value - a.value);
-
     if (restrictAccess) {
         // change the names to random names after the first 3 categories
         for (let i = 3; i < uniqueNamesArray.length; i++) {
