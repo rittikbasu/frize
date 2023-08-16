@@ -35,21 +35,21 @@ export default function Home({
   const [categories, setCategories] = useState(categoryData);
   const [daysData, setDaysData] = useState(sevenDaysData);
   const [restrictAccess, setRestrictAccess] = useState(false);
-  const [isRittik, setIsRittik] = useState(false);
+  const [isRittik, setIsRittik] = useState(true);
 
-  useEffect(() => {
-    async function fetchIsRittik() {
-      try {
-        const response = await fetch("/api/ip");
-        const data = await response.json();
-        setIsRittik(data.isRittik);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    }
+  // useEffect(() => {
+  //   async function fetchIsRittik() {
+  //     try {
+  //       const response = await fetch("/api/ip");
+  //       const data = await response.json();
+  //       setIsRittik(data.isRittik);
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   }
 
-    fetchIsRittik();
-  }, []);
+  //   fetchIsRittik();
+  // }, []);
 
   // from date should be 1 month before to date
   const fromDate = new Date();
