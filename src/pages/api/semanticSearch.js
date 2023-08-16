@@ -9,6 +9,7 @@ export default async function handler(req, res) {
 
         // OpenAI recommends replacing newlines with spaces for best results
         const input = query.replace(/\n/g, ' ')
+        console.log(input)
 
         const configuration = new Configuration({ apiKey: process.env.OPENAI_KEY }) // Set your OpenAI key as an environment variable
         const openai = new OpenAIApi(configuration)
@@ -25,7 +26,7 @@ export default async function handler(req, res) {
         const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY) // Set your Supabase URL and key as environment variables
         const { data: documents } = await supabase.rpc('match_timelogs', {
             query_embedding: embedding,
-            match_threshold: 0.81, // Choose an appropriate threshold for your data
+            match_threshold: 0.78, // Choose an appropriate threshold for your data
             match_count: 30, // Choose the number of matches
         })
         console.log(documents)
