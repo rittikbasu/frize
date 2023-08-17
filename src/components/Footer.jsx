@@ -42,7 +42,7 @@ export function Footer() {
             <NavLink href="https://www.linkedin.com/in/rittikbasu/">
               LinkedIn
             </NavLink>
-            <NavLink href="mailto:contact@rittik.io">Mail</NavLink>
+            <NavLink href="mailto:hello@rittik.io">Mail</NavLink>
           </div>
           <div className="flex gap-x-12 lg:hidden">
             <SocialLinkMobile
@@ -62,7 +62,7 @@ export function Footer() {
             />
             <SocialLinkMobile
               className="h-6 w-6"
-              href="mailto:contact@rittik.io"
+              href="mailto:hello@rittik.io"
               icon={MdEmail}
             />
           </div>
