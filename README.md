@@ -1,4 +1,4 @@
-## f r i z e
+# f r i z e
 
 A free and open-source dashboard for users of Rize (a time tracker that logs your computer usage).
 
@@ -10,7 +10,7 @@ Frize transforms your data into beautiful graphs and charts to help you visualis
 
 - Next.js
 - Tailwind CSS
-- Tremor
+- Tremor UI
 - Supabase
 - OpenAI
 - Vercel
@@ -19,14 +19,14 @@ Frize transforms your data into beautiful graphs and charts to help you visualis
 
 ### Prerequisites
 
-- Node.js: Make sure you have Node.js installed. You can download it from [nodejs.org](https://nodejs.org/).
-- npm
+- **Node.js:** Make sure you have Node.js installed. You can download it from [nodejs.org](https://nodejs.org/).
+- **npm**
   ```bash
   npm install npm@latest -g
   ```
-- Supabase: Create a project on [supabase.com](https://supabase.com/) and get your `SUPABASE_URL` and `SUPABASE_SERVICE_KEY`.
-- OpenAI: Create an account on [openai.com](https://openai.com/) and get your `OPENAI_KEY`.
-- Setup and the run the companion [python script](https://github.com/rittikbasu/rize_reader) for collecting data from your email.
+- **Supabase:** Create a project on [supabase.com](https://supabase.com/) and get your `SUPABASE_URL` and `SUPABASE_SERVICE_KEY`.
+- **OpenAI:** Create an account on [openai.com](https://openai.com/) and get your `OPENAI_KEY`.
+- **Data collection:** Setup and the run the companion [python script](https://github.com/rittikbasu/rize_reader) for collecting data from your email.
 
 ### Installation
 
