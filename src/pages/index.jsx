@@ -56,7 +56,8 @@ export default function Home({
   const fromDate = new Date();
   fromDate.setMonth(fromDate.getMonth() - 1);
   const toDate = new Date();
-  toDate.setDate(toDate.getDate() - 1);
+  toDate.setDate(toDate.getUTCDate() - 1);
+
   const [dateInput, setDateInput] = useState({
     from: fromDate,
     to: toDate,
