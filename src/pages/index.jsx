@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Head from "next/head";
 import { createClient } from "@supabase/supabase-js";
 import Chart from "@/components/Chart";
 import { Donut } from "@/components/Donut";
@@ -159,6 +160,9 @@ export default function Home({
 
   return (
     <div className="max-w-5xl lg:mx-auto flex flex-col items-center gap-y-10 lg:justify-center h-full px-4 my-24 lg:mt-36">
+      <Head>
+        <title>frize | Productivity Dashboard</title>
+      </Head>
       {/* put date range picker and search side by side */}
       <div className="flex flex-col justify-center items-center gap-y-10">
         <DateRangePicker
