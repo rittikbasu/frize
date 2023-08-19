@@ -28,6 +28,7 @@ export default function Home({
   categoryData,
   averageWorkWeekData,
   sevenDaysData,
+  lastWorkDay,
 }) {
   const [chartData, setChartData] = useState(data);
   const [totalHours, setTotalHours] = useState(totalHoursData);
@@ -37,6 +38,7 @@ export default function Home({
   const [daysData, setDaysData] = useState(sevenDaysData);
   const [restrictAccess, setRestrictAccess] = useState(false);
   const [isRittik, setIsRittik] = useState(false);
+  lastWorkDay = new Date(lastWorkDay);
 
   useEffect(() => {
     async function fetchIsRittik() {
@@ -67,59 +69,48 @@ export default function Home({
   last7Days.setDate(last7Days.getDate() - 7);
 
   async function dateChangeHandler(date) {
+    setDateInput(date);
     let currentRestrictAccess = restrictAccess;
     if (!isRittik) {
       console.log("Not Rittik");
       currentRestrictAccess = date.selectValue === "All time";
       setRestrictAccess(currentRestrictAccess);
     }
-    if (date.selectValue === "Last work day") {
-      const request = await fetch(`/api/supabase?type=last_work_day`);
+    if (date.to !== undefined && date.from !== undefined) {
+      let start;
+      let end;
+      if (
+        date.selectValue === "Last 7 days" ||
+        date.selectValue === "Last work day"
+      ) {
+        start = date.from;
+        end = date.to;
+      } else {
+        start = new Date(date.from);
+        start.setDate(start.getDate() + 1);
+        end = new Date(date.to);
+        end.setDate(end.getDate() + 1);
+      }
+
+      const request = await fetch(
+        `/api/supabase?start=${start.toISOString().slice(0, 10)}&end=${end
+          .toISOString()
+          .slice(0, 10)}&days=${getTotalDays(
+          start,
+          end
+        )}&restrictAccess=${currentRestrictAccess}&type=${
+          start === end ? "last_work_day" : ""
+        }`
+      );
       const response = await request.json();
       setChartData(response.data);
       setTotalHours(response.totalHoursData);
       setAverageHours(response.averageHoursData);
+      setAverageWorkWeek(response.averageWorkWeek);
       setCategories(response.categoryData);
-      const date = new Date(response.data[0].date);
-      date.setFullYear(new Date().getFullYear());
-      setDateInput({
-        from: date,
-        to: date,
-      });
-      setTotalDays(1);
-    } else {
-      setDateInput(date);
-      if (date.to !== undefined && date.from !== undefined) {
-        let start;
-        let end;
-        if (date.selectValue === "Last 7 days") {
-          start = date.from;
-          end = date.to;
-        } else {
-          start = new Date(date.from);
-          start.setDate(start.getDate() + 1);
-          end = new Date(date.to);
-          end.setDate(end.getDate() + 1);
-        }
-
-        const request = await fetch(
-          `/api/supabase?start=${start.toISOString().slice(0, 10)}&end=${end
-            .toISOString()
-            .slice(0, 10)}&days=${getTotalDays(
-            start,
-            end
-          )}&restrictAccess=${currentRestrictAccess}`
-        );
-        const response = await request.json();
-        setChartData(response.data);
-        setTotalHours(response.totalHoursData);
-        setAverageHours(response.averageHoursData);
-        setAverageWorkWeek(response.averageWorkWeek);
-        setCategories(response.categoryData);
-        setTotalDays(getTotalDays(start, end));
-        setDaysData(response.daysData);
-        // console.log(response.daysData);
-      }
+      setTotalDays(getTotalDays(start, end));
+      setDaysData(response.daysData);
+      // console.log(response.daysData);
     }
   }
 
@@ -185,6 +176,8 @@ export default function Home({
             color="lime"
             key="last_work_day"
             value="Last work day"
+            from={lastWorkDay}
+            to={lastWorkDay}
           />
           <DateRangePickerItem
             className=""
@@ -298,34 +291,35 @@ export default function Home({
 export const getStaticProps = async () => {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
   const supabaseServerKey = process.env.SUPABASE_SERVICE_KEY || "";
-  const SupabaseAdmin = createClient(supabaseUrl, supabaseServerKey);
-
+  const SupabaseAdmin = createClient(supabaseUrl, supabaseServerKey, {
+    auth: { persistSession: false },
+  });
   const startDate = new Date();
-  // startDate.setDate(startDate.getDate() - 2);
   startDate.setMonth(startDate.getMonth() - 1);
   const endDate = new Date();
   endDate.setDate(endDate.getDate() - 1);
 
+  let lastWorkDay = "";
+
   const { data, error } = await SupabaseAdmin.from("timelog")
     .select(
-      "work_hours, focus, breaks, date, categories, work_categories, nonwork_categories, day"
+      "work_hours, focus, breaks, date, categories, nonwork_categories, day"
     )
     .gte("date", startDate.toISOString().slice(0, 10))
     .lte("date", endDate.toISOString().slice(0, 10))
-    .order("date", { ascending: false });
+    .order("date");
   // .limit(130);
 
   if (error) {
     console.log(error);
   } else {
+    lastWorkDay = data[data.length - 1].date;
     // convert date to dd MMM format without year
     data.forEach((item) => {
       const date = new Date(item.date);
       const month = date.toLocaleString("default", { month: "short" });
       item.date = `${date.getDate()} ${month}`;
     });
-    // change the order of the data
-    data.reverse();
   }
 
   const insightsData = getInsights(data, getTotalDays(startDate, endDate));
@@ -343,6 +337,7 @@ export const getStaticProps = async () => {
       categoryData: categoryData,
       averageWorkWeekData: averageWorkWeek,
       sevenDaysData: daysData,
+      lastWorkDay: lastWorkDay,
     },
     revalidate: 1,
   };
