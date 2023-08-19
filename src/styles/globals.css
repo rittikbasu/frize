@@ -30,6 +30,11 @@ body {
   z-index: 1000;
 }
 
+.ring-2 {
+  --tw-ring-offset-shadow: none;
+  --tw-ring-shadow: none
+  box-shadow: none;
+}
 
 
 
