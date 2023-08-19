@@ -1,8 +1,7 @@
 import Link from "next/link";
 import clsx from "clsx";
 
-import { BsTwitter, BsGithub } from "react-icons/bs";
-import { FaLinkedinIn } from "react-icons/fa";
+import { BsTwitter, BsGithub, BsGlobe2 } from "react-icons/bs";
 import { MdEmail } from "react-icons/md";
 
 function NavLink({ href, children }) {
@@ -39,9 +38,7 @@ export function Footer() {
           <div className="hidden gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200 lg:flex">
             <NavLink href="https://twitter.com/_rittik">Twitter</NavLink>
             <NavLink href="https://github.com/rittikbasu">GitHub</NavLink>
-            <NavLink href="https://www.linkedin.com/in/rittikbasu/">
-              LinkedIn
-            </NavLink>
+            <NavLink href="https://rittik.io">Website</NavLink>
             <NavLink href="mailto:hello@rittik.io">Mail</NavLink>
           </div>
           <div className="flex gap-x-12 lg:hidden">
@@ -56,9 +53,9 @@ export function Footer() {
               icon={BsGithub}
             />
             <SocialLinkMobile
-              href="https://linkedin.com"
-              aria-label="Follow on LinkedIn"
-              icon={FaLinkedinIn}
+              href="https://rittik.io"
+              aria-label="Visit Personal Website"
+              icon={BsGlobe2}
             />
             <SocialLinkMobile
               className="h-6 w-6"
