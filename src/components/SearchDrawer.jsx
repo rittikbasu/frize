@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Button, Text, TextInput } from "@tremor/react";
+import { Button, Text } from "@tremor/react";
 import { BiSearch } from "react-icons/bi";
 import Drawer from "react-modern-drawer";
 
@@ -89,7 +89,12 @@ export default function SearchDrawer(props) {
     >
       <div className="my-4 h-full flex flex-col overflow-x-hidden">
         <div className="flex items-center px-4">
-          <Text className="text-2xl">AI Powered Search</Text>
+          <span className="flex items-center gap-x-2">
+            <Text className="text-2xl">AI Powered Search</Text>
+            <div className="px-2 text-sm dark:text-black text-white font-bold rounded-full bg-green-500 dark:bg-green-300">
+              BETA
+            </div>
+          </span>
           <Button
             size="sm"
             color="red"
