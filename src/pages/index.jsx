@@ -154,7 +154,6 @@ export default function Home({
       <div className="flex flex-col justify-center items-center gap-y-10">
         <DateRangePicker
           className="max-w-xs lg:max-w-sm mx-auto px-4"
-          enableSelect={true}
           enableYearNavigation={true}
           enableClear={true}
           placeholder="Select a date range"
@@ -167,7 +166,6 @@ export default function Home({
           color="lime"
         >
           <DateRangePickerItem
-            className=""
             color="lime"
             key="last_work_day"
             value="Last work day"
@@ -175,7 +173,6 @@ export default function Home({
             to={lastWorkDay}
           />
           <DateRangePickerItem
-            className=""
             color="lime"
             key="last_7_days"
             value="Last 7 days"
@@ -183,7 +180,6 @@ export default function Home({
             to={toDate}
           />
           <DateRangePickerItem
-            className=""
             color="lime"
             key="all_data"
             value="All time"
