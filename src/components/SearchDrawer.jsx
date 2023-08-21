@@ -91,7 +91,7 @@ export default function SearchDrawer(props) {
         <div className="flex items-center px-4">
           <span className="flex items-center gap-x-2">
             <Text className="text-2xl">AI Powered Search</Text>
-            <div className="px-2 text-sm dark:text-black text-white font-bold rounded-full bg-green-500 dark:bg-green-300">
+            <div className="px-2 text-xs dark:text-black text-white font-bold rounded-full bg-green-500 dark:bg-green-300">
               BETA
             </div>
           </span>
@@ -167,8 +167,9 @@ export default function SearchDrawer(props) {
             <button
               className={`p-[0.65rem] text-white rounded-full ${
                 loading && "animate-spin opacity-60 cursor-wait"
-              } bg-blue-500 dark:bg-blue-700`}
-              disabled={loading}
+              } ${!query && "opacity-60"} bg-blue-500 dark:bg-blue-700`}
+              // disable when query is empty or loading
+              disabled={!query || loading}
               onClick={handleSearch}
             >
               <BiSearch />
