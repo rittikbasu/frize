@@ -19,7 +19,6 @@ function processData(data) {
 
 export default async (req, res) => {
   if (req.method === 'GET') {
-    let data;
     if (req.query.type === 'last_work_day') {
       const { data } = await SupabaseAdmin.from('timelog')
         .select("work_hours, focus, breaks, date, categories")
