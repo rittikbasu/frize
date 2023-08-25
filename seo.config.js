@@ -35,5 +35,48 @@ export default {
         name: 'apple-mobile-web-app-status-bar-style',
         content: 'black',
     },
+    {
+        name: 'apple-mobile-web-app-title',
+        content: 'frize',
+    },
+],
+additionalLinkTags: [
+    {
+        rel: 'icon',
+        href: '/favicon/favicon.ico',
+    },
+    {
+        rel: 'apple-touch-icon',
+        href: '/favicon/apple-touch-icon.png',
+        sizes: '180x180',
+    },
+    {
+        rel: 'icon',
+        href: '/favicon/favicon-32x32.png',
+        sizes: '32x32',
+        type: 'image/png',
+    },
+    {
+        rel: 'icon',
+        href: '/favicon/favicon-16x16.png',
+        sizes: '16x16',
+        type: 'image/png',
+    },
+    {
+        rel: 'android-chrome-192x192',
+        href: '/favicon/android-chrome-192x192.png',
+        sizes: '192x192',
+        type: 'image/png',
+    },
+    {
+        rel: 'android-chrome-512x512',
+        href: '/favicon/android-chrome-512x512.png',
+        sizes: '512x512',
+        type: 'image/png',
+    },
+    {
+        rel: 'manifest',
+        href: '/favicon/site.webmanifest',
+    },
 ],
 }
