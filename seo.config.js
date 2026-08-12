@@ -2,6 +2,7 @@ export default {
   defaultTitle: 'frize | Productivity Dashboard',
   description:
     "An interactive dashboard that transforms your Rize data into beautiful charts and graphs.",
+  canonical: 'https://frize.rittik.fyi/',
   openGraph: {
     title: 'frize',
     description:
@@ -16,7 +17,7 @@ export default {
     ],
     type: 'website',
     locale: 'en_US',
-    url: 'https://frize.rittik.io',
+    url: 'https://frize.rittik.fyi',
     site_name: 'frize',
   },
   twitter: {

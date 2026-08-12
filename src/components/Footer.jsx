@@ -38,8 +38,8 @@ export function Footer() {
           <div className="hidden gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200 lg:flex">
             <NavLink href="https://twitter.com/_rittik">Twitter</NavLink>
             <NavLink href="https://github.com/rittikbasu">GitHub</NavLink>
-            <NavLink href="https://rittik.io">Website</NavLink>
-            <NavLink href="mailto:hello@rittik.io">Mail</NavLink>
+            <NavLink href="https://rittik.fyi">Website</NavLink>
+            <NavLink href="mailto:hey@rittik.fyi">Mail</NavLink>
           </div>
           <div className="flex gap-x-12 lg:hidden">
             <SocialLinkMobile
@@ -53,13 +53,13 @@ export function Footer() {
               icon={BsGithub}
             />
             <SocialLinkMobile
-              href="https://rittik.io"
+              href="https://rittik.fyi"
               aria-label="Visit Personal Website"
               icon={BsGlobe2}
             />
             <SocialLinkMobile
               className="h-6 w-6"
-              href="mailto:hello@rittik.io"
+              href="mailto:hey@rittik.fyi"
               icon={MdEmail}
             />
           </div>
